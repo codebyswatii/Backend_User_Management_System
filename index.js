@@ -66,10 +66,10 @@ app.get('/users', (req, res) => {
 //Edit user route
 app.get('/user/:id/edit', (req, res) => {
   let {id} = req.params;
-  let q = `SELECT * FROM user WHERE id = '${id}'`;
+  let q = `SELECT * FROM user WHERE id = ?`;
 
   try{
-    connection.query(q, (err, result) => { 
+    connection.query(q, [id], (err, result) => { 
       if (err) throw err;
       let user = result[0];
       res.render("edit.ejs",{user});
@@ -84,17 +84,17 @@ app.get('/user/:id/edit', (req, res) => {
 app.patch('/user/:id', (req, res) => {
   let {id} = req.params;
   let {password: formPass,username: newUsername} = req.body;
-  let q = `SELECT * FROM user WHERE id = '${id}'`;
+  let q = `SELECT * FROM user WHERE id = ?`;
 
   try{
-    connection.query(q, (err, result) => { 
+    connection.query(q, [id], (err, result) => { 
       if (err) throw err;
         let user = result[0];
         if (formPass!=user.password) {
         res.send('Password incorrect. Cannot update username.');
         } else {
-          let q2 = `UPDATE user SET username = '${newUsername}' WHERE id = '${id}'`;
-          connection.query(q2, (err, result) => {
+          let q2 = `UPDATE user SET username = ? WHERE id = ?`;
+          connection.query(q2, [newUsername, id], (err, result) => {
             if (err) throw err;
             res.redirect('/users');
           });
@@ -154,5 +154,3 @@ app.listen(8080, () => {
 });
 
 
-
-// connection.end();
